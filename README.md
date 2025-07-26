@@ -1,5 +1,5 @@
 # phashboard
-PHP dashboard.
+`"php" + "dashboard" = "phashboard"`
 
 I chose this stupid name because originally I'd written this project in rails and called it "rashboard" which I thought was cool and just funny enough, but after [some misadventures off the happy path in rails](https://0x85.org/php.html) I realized I was expending way too much effort just to display some charts and some html for my own personal use, so I wrote the initial version of this in a single 4-hour stretch while flying from Toronto to the west coast.
 
