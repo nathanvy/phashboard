@@ -229,7 +229,8 @@ $returnHistogram = ['labels' => $labels, 'counts' => $counts];
         window.RETURN_HISTOGRAM = <?= json_encode($returnHistogram) ?>;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-luxon"></script>
     <script src="/js/charts.js"></script>
 </head>
 

@@ -20,7 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         unit: "hour",
                         tooltipFormat: "MMM d, yyyy HH:mm"
                     },
-                    title: { display: true, text: "Time" }
+                    adapters: {
+                        date: {
+                            zone: 'America/New_York'
+                        }
+                    },
+                    title: { display: true, text: 'Time (US Eastern)' }
                 },
                 y: {
                     beginAtZero: true,
