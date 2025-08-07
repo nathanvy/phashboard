@@ -1,14 +1,28 @@
 <?php
-// dashboard.php
-// Simple dashboard in modern PHP connecting to Postgres via PDO
-
-// Database configuration
+// database config
 $host = '127.0.0.1';
 $port = '5432';
 $db   = 'foo';
 $user = 'bar';
 $pass = 'hunter2';
 $dsn  = "pgsql:host={$host};port={$port};dbname={$db}";
+
+// parse requested date from url
+$requestUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$segments = explode('/', trim($requestUrl, '/'));
+if (isset($segments[0]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $segments[0])) {
+    $date = $segments[0];
+} else {
+    $date = date('Y-m-d');
+}
+
+$d = DateTime::createFromFormat('Y-m-d', $date);
+if (!$d || $d->format('Y-m-d') !== $date) {
+    http_response_code(400);
+    header('Content-Type: text/plain');
+    echo 'Invalid date format';
+    exit;
+}
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
@@ -17,7 +31,9 @@ try {
 }
 
 // Simply fetch all trades in table
-$stmt  = $pdo->query('SELECT * FROM trades ORDER BY dtg');
+$sql  = 'SELECT * FROM trades WHERE dtg::date = :date ORDER BY dtg';
+$stmt = $pdo->prepare($sql);
+$stmt->execute(['date' => $date]);
 $trades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //pair open/close trades and compute base fields + realized P&L in cents
@@ -205,21 +221,29 @@ $returnHistogram = ['labels' => $labels, 'counts' => $counts];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
     <script>
         window.EQUITY_SERIES = <?= json_encode($equitySeries) ?>;
     </script>
     <script>
         window.RETURN_HISTOGRAM = <?= json_encode($returnHistogram) ?>;
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="/js/charts.js"></script>
-    <link rel="stylesheet" href="/css/styles.css" />
 </head>
 
 <body>
     <div class="dashboard">
         <h1>Zalgo v1.30a Performance</h1>
+        <label for="datePicker">Select Date:</label>
+        <input type="date" id="datePicker" value="<?= htmlspecialchars($date) ?>">
+        <script>
+            document.getElementById('datePicker').addEventListener('change', function() {
+                const d = this.value;
+                window.location.href = '/' + d;
+            });
+        </script>
         <div class="charts-container">
             <div class="equity-curve chart-item">
                 <canvas id="equityChart"></canvas>
