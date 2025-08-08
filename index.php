@@ -26,6 +26,7 @@ if (!$d || $d->format('Y-m-d') !== $date) {
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $pdo->exec("SET TIME ZONE 'America/New_York'");
 } catch (PDOException $e) {
     die("DB Connection failed: " . $e->getMessage());
 }
