@@ -158,11 +158,12 @@ function computeEquitySeries(array $completedTrades): array
         return strtotime($a['close_dtg']) <=> strtotime($b['close_dtg']);
     });
 
-    $firstDt = new DateTime($completedTrades[0]['close_dtg']);
+    $eastern = new DateTimeZone('America/New_York');
+    $firstDt = (new DateTime($completedTrades[0]['close_dtg']))->setTimezone($eastern);
     $curveDate = $firstDt->format('Y-m-d');
 
-    $sessionStart = new DateTime("$curveDate 09:30:00");
-    $sessionEnd = new DateTime("$curveDate 16:00:00");
+    $sessionStart = new DateTime("$curveDate 09:30:00", $eastern);
+    //$sessionEnd = new DateTime("$curveDate 16:00:00");
 
     $cum = 0.0;
     //chartjs expects milliseconds since epoch, so *= 1000
@@ -230,8 +231,8 @@ $returnHistogram = ['labels' => $labels, 'counts' => $counts];
         window.RETURN_HISTOGRAM = <?= json_encode($returnHistogram) ?>;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
     <script src="/js/charts.js"></script>
 </head>
 
